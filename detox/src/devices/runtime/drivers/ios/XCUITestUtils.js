@@ -111,7 +111,11 @@ function runXCUITest(
 
   const isRunningOnTerminal = process.stdout.isTTY;
   const disableRunInTerminal = process.env.DISABLE_TERMINAL === '1';
-  if (isRunningOnTerminal !== true && disableRunInTerminal !== true) {
+  const runCommandInTerminalV2 = process.env.RUN_IN_TERMINAL_V2 === '1';
+  if (runCommandInTerminalV2 === true) {
+    log.debug(`[XCUITest] Running command in Terminal V2`);
+    return _runCommandInTerminalV2(command, options);
+  } else if (isRunningOnTerminal !== true && disableRunInTerminal !== true) {
     log.debug(`[XCUITest] Currently not running through the Terminal, trying to execute the command from the Terminal`);
 
     try {
@@ -148,6 +152,12 @@ function _runCommandInTerminal(command, options) {
     `;
 
   return execWithRetriesAndLogs(`osascript -e '${appleScript}'`, options);
+}
+
+function _runCommandInTerminalV2(command, options) {
+  // run using open terminal
+  const escapedCommand = command.replace(/"/g, '\\"'); // escape double quotes
+  return execWithRetriesAndLogs(`open -a Terminal.app "${escapedCommand}"`, options);
 }
 
 function _allowNetworkPermissionsXCUITest() {
