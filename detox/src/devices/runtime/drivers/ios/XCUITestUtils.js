@@ -110,7 +110,8 @@ function runXCUITest(
   log.debug(`[XCUITest] Running command: ${command}`);
 
   const isRunningOnTerminal = process.stdout.isTTY;
-  if (isRunningOnTerminal !== true) {
+  const disableRunInTerminal = process.env.DISABLE_TERMINAL === '1';
+  if (isRunningOnTerminal !== true && disableRunInTerminal !== true) {
     log.debug(`[XCUITest] Currently not running through the Terminal, trying to execute the command from the Terminal`);
 
     try {
